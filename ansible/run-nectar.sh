@@ -1,0 +1,1 @@
+. ./unimelb-comp90024-2021-grp-60-openrc.sh; ansible-playbook --ask-become-pass nectar.yaml
