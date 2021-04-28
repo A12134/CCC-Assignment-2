@@ -1,0 +1,87 @@
+##### 0. proxy #####
+sudo nano /etc/enviroment
+
+HTTP_PROXY=http://wwwproxy.unimelb.edu.au:8000/
+
+HTTPS_PROXY=http://wwwproxy.unimelb.edu.au:8000/
+
+http_proxy=http://wwwproxy.unimelb.edu.au:8000/
+
+https_proxy=http://wwwproxy.unimelb.edu.au:8000/
+
+no_proxy=localhost,127.0.0.1,localaddress,172.16.0.0/12,.melbourne.rc.nectar.org.au,.storage.unimelb.edu.au,.cloud.unimelb.edu.au
+
+##### 1. install docker ##### 
+sudo apt-get remove docker docker-engine docker.io containerd runc  (continue? Y)
+
+sudo apt-get update
+
+sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+echo \
+  "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt-get update
+
+sudo apt-get install docker-ce docker-ce-cli containerd.io
+
+##### 2. add proxy for docker daemon #####
+sudo mkdir -p /etc/systemd/system/docker.service.d
+
+sudo nano /etc/systemd/system/docker.service.d/http-proxy.conf
+
+[Service]
+Environment="HTTP_PROXY=http://wwwproxy.unimelb.edu.au:8000/"
+
+Environment="HTTPS_PROXY=http://wwwproxy.unimelb.edu.au:8000/"
+
+Environment="http_proxy=http://wwwproxy.unimelb.edu.au:8000/"
+
+Environment="https_proxy=http://wwwproxy.unimelb.edu.au:8000/"
+
+Environment="no_proxy=localhost,127.0.0.1,localaddress,172.16.0.0/12,.melbourne.rc.nectar.org.au,.storage.unimelb.edu.au,.cloud.unimelb.edu.au"
+
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+
+##### 3. couchDB #####
+export declare -a nodes=(172.26.132.182 172.26.132.249 172.26.131.41)
+export masternode=`echo ${nodes} | cut -f1 -d' '`
+export declare  -a othernodes=`echo ${nodes[@]} | sed s/${masternode}//`
+export size=${#nodes[@]}
+export user='admin'
+export pass='admin'
+export VERSION='3.1.1'
+export cookie='a192aeb9904e6590849337933b000c99'
+
+sudo docker pull ibmcom/couchdb3:${VERSION}
+
+sudo docker create\
+      --name couchdb${masternode}\
+      --env COUCHDB_USER=${user}\
+      --env COUCHDB_PASSWORD=${pass}\
+      --env COUCHDB_SECRET=${cookie}\
+      --env ERL_FLAGS="-setcookie \"${cookie}\" -name \"couchdb@${masternode}\""\
+      -p 5984:5984\
+      ibmcom/couchdb3:${VERSION}
+
+declare -a conts=(`sudo docker ps --all | grep couchdb | cut -f1 -d' ' | xargs -n${size} -d'\n'`)
+
+sudo docker start $conts
+
+
+
+
+
+
+
+
+
