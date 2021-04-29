@@ -107,7 +107,7 @@ curl -XPOST "http://${user}:${pass}@${masternode}:5984/_cluster_setup"\
 
 
 
-
-
+# -- Create DB with shards and replicates 
+# curl -XPUT "http://${user}:${pass}@${masternode}:5984/__DBNAME__?q=3&n=2"
 
 
