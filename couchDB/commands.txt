@@ -1,5 +1,5 @@
 ##### 0. proxy #####
-sudo nano /etc/enviroment
+sudo nano /etc/environment
 
 HTTP_PROXY=http://wwwproxy.unimelb.edu.au:8000/
 
@@ -12,9 +12,11 @@ https_proxy=http://wwwproxy.unimelb.edu.au:8000/
 no_proxy=localhost,127.0.0.1,localaddress,172.16.0.0/12,.melbourne.rc.nectar.org.au,.storage.unimelb.edu.au,.cloud.unimelb.edu.au
 
 ##### 1. install docker ##### 
-sudo apt-get remove docker docker-engine docker.io containerd runc  (continue? Y)
+sudo apt-get remove docker docker-engine docker.io containerd runc
 
 sudo apt-get update
+
+sudo apt-get upgrade
 
 sudo apt-get install \
     apt-transport-https \
@@ -52,9 +54,10 @@ Environment="no_proxy=localhost,127.0.0.1,localaddress,172.16.0.0/12,.melbourne.
 sudo systemctl daemon-reload
 sudo systemctl restart docker
 
-##### 3. couchDB #####
+##### 3. set up couchDB container on each nodes#####
 export declare -a nodes=(172.26.132.182 172.26.132.249 172.26.131.41)
 export masternode=`echo ${nodes} | cut -f1 -d' '`
+export currentnode=${nodes[0]}
 export declare  -a othernodes=`echo ${nodes[@]} | sed s/${masternode}//`
 export size=${#nodes[@]}
 export user='admin'
@@ -65,18 +68,41 @@ export cookie='a192aeb9904e6590849337933b000c99'
 sudo docker pull ibmcom/couchdb3:${VERSION}
 
 sudo docker create\
-      --name couchdb${masternode}\
+      --name couchdb${currentnode}\
       --env COUCHDB_USER=${user}\
       --env COUCHDB_PASSWORD=${pass}\
       --env COUCHDB_SECRET=${cookie}\
-      --env ERL_FLAGS="-setcookie \"${cookie}\" -name \"couchdb@${masternode}\""\
+      --env ERL_FLAGS="-setcookie \"${cookie}\" -name \"couchdb@${currentnode}\""\
       -p 5984:5984\
+      -p 4369:4369\
+      -p 9100:9100\
       ibmcom/couchdb3:${VERSION}
 
 declare -a conts=(`sudo docker ps --all | grep couchdb | cut -f1 -d' ' | xargs -n${size} -d'\n'`)
 
 sudo docker start $conts
 
+##### 4. set up couchDB cluster on masternode##### 
+for node in ${othernodes} 
+do
+    curl -XPOST "http://${user}:${pass}@${masternode}:5984/_cluster_setup" \
+      --header "Content-Type: application/json"\
+      --data "{\"action\": \"enable_cluster\", \"bind_address\":\"0.0.0.0\",\
+             \"username\": \"${user}\", \"password\":\"${pass}\", \"port\": \"5984\",\
+             \"remote_node\": \"${node}\", \"node_count\": \"$(echo ${nodes[@]} | wc -w)\",\
+             \"remote_current_user\":\"${user}\", \"remote_current_password\":\"${pass}\"}"
+done
+
+for node in ${othernodes}
+do
+    curl -XPOST "http://${user}:${pass}@${masternode}:5984/_cluster_setup"\
+      --header "Content-Type: application/json"\
+      --data "{\"action\": \"add_node\", \"host\":\"${node}\",\
+             \"port\": \"5984\", \"username\": \"${user}\", \"password\":\"${pass}\"}"
+done
+
+curl -XPOST "http://${user}:${pass}@${masternode}:5984/_cluster_setup"\
+    --header "Content-Type: application/json" --data "{\"action\": \"finish_cluster\"}"
 
 
 
