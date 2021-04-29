@@ -104,10 +104,7 @@ done
 curl -XPOST "http://${user}:${pass}@${masternode}:5984/_cluster_setup"\
     --header "Content-Type: application/json" --data "{\"action\": \"finish_cluster\"}"
 
-
-
-
-# -- Create DB with shards and replicates 
-# curl -XPUT "http://${user}:${pass}@${masternode}:5984/__DBNAME__?q=3&n=2"
+##### 5. create database #####
+curl -XPUT "http://${user}:${pass}@${masternode}:5984/twitter?n=3&q=8&partitioned=true"
 
 
