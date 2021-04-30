@@ -14,7 +14,7 @@
     headers:
       Content-Type: "application/json"
     body_format: json
-    body: "{\"action\": \"enable_cluster\", \"bind_address\": \"0.0.0.0\", \"username\":\"{{ user }}\", \"password\": \"{{ pass }}\", \"port\": \"5984\", \"remote_node\": \"{{ inventory_hostname }}\", \"node_count\": \"3\",\"remote_current_user\": \"{{ user }}\", \"remote_current_password\":\"{{ pass }}\"}"
+    body: "{\"action\": \"enable_cluster\", \"bind_address\": \"0.0.0.0\", \"username\":\"{{ user }}\", \"password\": \"{{ pass }}\", \"port\": \"5984\", \"remote_node\": \"172.26.130.11\", \"node_count\": \"3\",\"remote_current_user\": \"{{ user }}\", \"remote_current_password\":\"{{ pass }}\"}"
 
 # Join nodes to CouchDB cluster
 - name: Join nodes to CouchDB cluster
@@ -28,7 +28,35 @@
     headers:
       Content-Type: "application/json"
     body_format: json
-    body: "{\"action\":\"add_node\",\"host\":\"{{ inventory_hostname }}\",\"port\":\"5984\",\"username\":\"{{ user }}\",\"password\":\"{{ pass }}\"}"
+    body: "{\"action\":\"add_node\",\"host\":\"172.26.130.11\",\"port\":\"5984\",\"username\":\"{{ user }}\",\"password\":\"{{ pass }}\"}"
+
+    # Add nodes to CouchDB cluster
+- name: Add nodes to CouchDB cluster
+  uri:
+    url: http://{{ masternode }}:5984/_cluster_setup
+    method: POST
+    user: "{{ user }}"
+    password: "{{ pass }}"
+    force_basic_auth: yes
+    status_code: 200, 201
+    headers:
+      Content-Type: "application/json"
+    body_format: json
+    body: "{\"action\": \"enable_cluster\", \"bind_address\": \"0.0.0.0\", \"username\":\"{{ user }}\", \"password\": \"{{ pass }}\", \"port\": \"5984\", \"remote_node\": \"172.26.133.255\", \"node_count\": \"3\",\"remote_current_user\": \"{{ user }}\", \"remote_current_password\":\"{{ pass }}\"}"
+
+# Join nodes to CouchDB cluster
+- name: Join nodes to CouchDB cluster
+  uri:
+    url: http://{{ masternode }}:5984/_cluster_setup
+    method: POST
+    user: "{{ user }}"
+    password: "{{ pass }}"
+    force_basic_auth: yes
+    status_code: 200, 201
+    headers:
+      Content-Type: "application/json"
+    body_format: json
+    body: "{\"action\":\"add_node\",\"host\":\"172.26.133.255\",\"port\":\"5984\",\"username\":\"{{ user }}\",\"password\":\"{{ pass }}\"}"
 
 # Empty request to avoid error messages when finishing cluster setup
 - name: Empty request to avoid error messages when finishing cluster setup
@@ -54,3 +82,14 @@
     body_format: json
     body: "{\"action\":\"finish_cluster\"}"    
   run_once: true
+
+- name: create database
+  become: yes
+  shell: curl -X PUT http://{{ user }}:{{ pass }}@{{ masternode }}:5984/twitter?n=3&q=8&partitioned=true
+
+
+
+
+
+
+

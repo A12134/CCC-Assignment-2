@@ -2,4 +2,4 @@
 ---
 
 # Use first node in hosts list as masternode for CouchDB
-masternode: "172.26.131.3"
+masternode: "172.26.131.4"
