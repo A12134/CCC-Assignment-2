@@ -1,27 +1,58 @@
 
-- name: Create instances
+- name: create instance2
   os_server:
-    name: '{{ item.name }}'
-    image:  '{{ instance_image }}'
-    key_name:  '{{ instance_key_name }}'
-    flavor:  '{{ instance_flavor }}' 
-    network:  '{{ network }}'
-    availability_zone:  '{{ availability_zone }}'
-    security_groups:  '{{ sg_names }}'
-    volumes:  '{{ item.volumes }}'
+    name: "{{ instance2_name }}"
+    image: "{{ instance_image }}"
+    key_name: "{{ instance_key_name }}"
+    flavor: "{{ instance_flavor }}"
+    availability_zone: "{{ availability_zone }}"
+    security_groups: "{{ sg_names }}"
     auto_floating_ip: yes
     wait: yes
-    timeout : 600
-    state : present
-  loop: '{{ instances }}'
-  register: os_instance
+    timeout: 600
+    state: present
+  register: os_instance2
 
+- debug:
+    msg: "Instance {{ instance2_name }} has been created. IP address is {{ os_instance2.openstack.public_v4 }}"
+  when: os_instance2.openstack is defined
 
+- name: create instance1
+  os_server:
+    name: "{{ instance1_name }}"
+    image: "{{ instance_image }}"
+    key_name: "{{ instance_key_name }}"
+    flavor: "{{ instance_flavor }}"
+    availability_zone: "{{ availability_zone }}"
+    security_groups: "{{ sg_names }}"
+    auto_floating_ip: yes
+    wait: yes
+    timeout: 600
+    state: present
+  register: os_instance1
 
-- debug: 
-    msg: "instances {{ item.openstack.name }} has been created ,IP address is {{ item.openstack.public_v4 }}."
-  loop: "{{ os_instance.results }}"
-  when: item.openstack is defined
+- debug:
+    msg: "Instance {{ instance1_name }} has been created. IP address is {{ os_instance1.openstack.public_v4 }}"
+  when: os_instance1.openstack is defined
+
+- name: create instance3
+  os_server:
+    name: "{{ instance3_name }}"
+    image: "{{ instance_image }}"
+    key_name: "{{ instance_key_name }}"
+    flavor: "{{ instance_flavor }}"
+    availability_zone: "{{ availability_zone }}"
+    security_groups: "{{ sg_names }}"
+    auto_floating_ip: yes
+    wait: yes
+    timeout: 600
+    state: present
+  register: os_instance3
+
+- debug:
+    msg: "Instance {{ instance3_name }} has been created. IP address is {{ os_instance3.openstack.public_v4 }}"
+  when: os_instance3.openstack is defined
+
 
 
 - name: create instance4
@@ -44,14 +75,14 @@
 
 
 
-- name: Wait for connection
-  wait_for:
-    host: '{{ item.openstack.public_v4 }}'
-    port: 22
-    timeout : 120
-    search_regex: OpenSSH
-  loop : '{{ os_instance.results }}'
-  when : item.openstack is defined
+# - name: Wait for connection
+#   wait_for:
+#     host: '{{ item.openstack.public_v4 }}'
+#     port: 22
+#     timeout : 120
+#     search_regex: OpenSSH
+#   loop : '{{ os_instance.results }}'
+#   when : item.openstack is defined
 
 
 
@@ -62,3 +93,10 @@
     groups: COMP90024
   loop : '{{ os_instance.results }}'
   when: item.openstack is defined
+
+# - name: create file
+#   become: yes
+#   template:
+#     src: hosts.j2
+#     dest: "{{ node_inventory_file }}"
+

@@ -1,0 +1,9 @@
+# Install Docker 
+- hosts: all_servers
+  vars_files:
+    - host-vars/proxy.yaml
+  gather_facts: true
+
+  roles:
+    - role: docker-common
+    - role: docker-install

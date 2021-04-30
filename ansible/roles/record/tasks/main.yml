@@ -1,0 +1,13 @@
+# render the templates
+
+- name: output the IP to inventory file
+  vars:
+    
+    instance1_ip: "{{ os_instance1.openstack.public_v4 }}"
+    instance2_ip: "{{ os_instance2.openstack.public_v4 }}"
+    instance3_ip: "{{ os_instance3.openstack.public_v4 }}"
+    instance4_ip: "{{ os_instance4.openstack.public_v4 }}"
+  template:
+    src: inventory.ini.j2
+    dest: ./inventory.ini
+

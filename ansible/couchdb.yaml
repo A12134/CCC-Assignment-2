@@ -1,0 +1,22 @@
+
+ # Perform CouchDB configuration on all hosts except Masternode
+- hosts: subnode1:subnode2:subnode3
+  vars_files:
+    - host-vars/couchdb.yaml
+    - host-vars/proxy.yaml
+  gather_facts: true
+
+  roles:
+    - role: coughdb-install
+
+
+
+ # Perform CouchDB configuration on all hosts except Masternode
+- hosts: subnode2:subnode3
+  vars_files:
+    - host-vars/couchdb.yaml
+    - host-vars/proxy.yaml
+  gather_facts: true
+
+  roles:
+    - role: coughdb-setup

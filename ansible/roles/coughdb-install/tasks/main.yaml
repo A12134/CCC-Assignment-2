@@ -1,0 +1,28 @@
+
+- name: Stop CouchDB Docker container
+  become: yes
+  docker_container:
+    name: couchdb
+    state: absent
+
+# Create new docker container for CouchDB and start container
+- name: Create and start CouchDB Docker container
+  become: yes
+  docker_container:
+    name: couchdb
+    image: "ibmcom/couchdb3:{{ VERSION }}"
+    state: started
+    recreate: true
+    ports:
+      - "5984:5984"
+      - "4369:4369"
+      - "9100:9100"
+    pull: yes
+    env:
+      COUCHDB_USER: "{{ user }}"
+      COUCHDB_PASSWORD: "{{ pass }}"
+      COUCHDB_SECRET: "{{ cookie }}"
+      ERL_FLAGS: "-setcookie \"{{ cookie }}\" -name \"couchdb@{{ inventory_hostname }}\""
+
+
+
