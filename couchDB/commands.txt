@@ -16,7 +16,7 @@ sudo apt-get remove docker docker-engine docker.io containerd runc
 
 sudo apt-get update
 
-sudo apt-get upgrade
+sudo apt-get upgrade  # continue? y
 
 sudo apt-get install \
     apt-transport-https \
@@ -55,9 +55,9 @@ sudo systemctl daemon-reload
 sudo systemctl restart docker
 
 ##### 3. set up couchDB container on each nodes#####
-export declare -a nodes=(172.26.132.182 172.26.132.249 172.26.131.41)
+export declare -a nodes=(172.26.132.182 172.26.132.249 172.26.131.41)  # to be updated
 export masternode=`echo ${nodes} | cut -f1 -d' '`
-export currentnode=${nodes[0]}
+export currentnode=${nodes[0]}  # to be updated for each nodes to 0,1,2
 export declare  -a othernodes=`echo ${nodes[@]} | sed s/${masternode}//`
 export size=${#nodes[@]}
 export user='admin'
