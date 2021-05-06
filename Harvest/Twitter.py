@@ -13,22 +13,24 @@ class DateEncoder(json.JSONEncoder):
         else:
             return json.JSONEncoder.default(self, obj)
 
+class TwitterAPI:
+    def __init__(self):
+        f = open("TwitterAuth.json", 'r', encoding='utf-8')
+        self.tokens = json.load(f)
+        f.close()
+        self.tokenIndex = 0
 
-def twitter_setup():
-    """
-    Utility function to setup the Twitter's API with our access keys provided.
-    """
-    consumer_key = 'K9TONA3DHJSD8LNkIBHLXGRZH'
-    consumer_secret = 'CAUNPDOzqX4BLcHQijNztyZG1jaWCm0UCH0R90gBMNYRKHqoRF'
-    access_token = '1384421870506713090-uXkvcSe3kjr2xlNAueY8WDU93fK3hE'
-    access_token_secret = '0L6eSYLhPfuPPlu28rAhQsaxLTSOsR4w9H9EK732MSb9x'
+    def generate_api(self):
+        token = self.tokens[self.tokenIndex]
+        auth = tweepy.OAuthHandler(token["consumer_key"], token["consumer_secret"])
+        auth.set_access_token(token["access_token"], token["access_token_secret"])
 
-    # Authorization and Authentication
-    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-    auth.set_access_token(access_token, access_token_secret)
+        api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+        return api
 
-    api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
-    return api
+    def generate_new_api(self):
+        self.tokenIndex = (self.tokenIndex + 1) % len(self.tokens)
+        return self.generate_api()
 
 
 def is_alphabet(uchar):
@@ -82,13 +84,8 @@ def count_sentiment(text):
     [polarity, subjectivity] = blob.sentiment
     return polarity, subjectivity
 
-
-def main():
-    url = 'http://admin:admin@172.26.131.4:5984/twitter'  # couchDB url
-    header = {"Content-Type": "application/json"}
-    api = twitter_setup()
-    regions = ["sydney", "melbourne", "canberra", "brisbane", "adelaide", "perth"]
-    for city_name in regions:
+def harvest_to_couchdb(api,url,header,city_name):
+    try:
         places = api.geo_search(query=city_name, granularity="city")
         place_id = places[0].id
         # i = MAX_QUERIES
@@ -105,6 +102,19 @@ def main():
             elif res:
                 res = json.dumps(res, cls=DateEncoder)
                 requests.post(url=url, headers=header, data=res)
+        return True
+    except tweepy.Tweepy.Error:
+        return False
+
+def main():
+    url = 'http://admin:admin@172.26.131.4:5984/twitter'  # couchDB url
+    header = {"Content-Type": "application/json"}
+    apiData = TwitterAPI()
+    api = apiData.generate_api()
+    regions = ["sydney", "melbourne", "canberra", "brisbane", "adelaide", "perth"]
+    for city_name in regions:
+        while not harvest_to_couchdb(api, url, header, city_name):
+            api = apiData.generate_new_api()
 
 
 if __name__ == "__main__":
