@@ -4,7 +4,8 @@ import datetime
 import json
 import tweepy
 import requests
-
+import subprocess
+import sys
 
 class DateEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -103,7 +104,7 @@ def harvest_to_couchdb(api,url,header,city_name):
                 res = json.dumps(res, cls=DateEncoder)
                 requests.post(url=url, headers=header, data=res)
         return True
-    except tweepy.Tweepy.Error:
+    except:
         return False
 
 def main():
@@ -116,6 +117,9 @@ def main():
         while not harvest_to_couchdb(api, url, header, city_name):
             api = apiData.generate_new_api()
 
+def install():
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "-r", "requirements.txt"])
 
 if __name__ == "__main__":
+    install()
     main()
