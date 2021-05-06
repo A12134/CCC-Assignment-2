@@ -26,7 +26,7 @@ class TwitterAPI:
         auth = tweepy.OAuthHandler(token["consumer_key"], token["consumer_secret"])
         auth.set_access_token(token["access_token"], token["access_token_secret"])
 
-        api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+        api = tweepy.API(auth, wait_on_rate_limit=False)
         return api
 
     def generate_new_api(self):
@@ -64,6 +64,7 @@ def process(twi):
         return -1
     if search:
         res['_id'] = str(twi.user.id) + ":" + str(twi.id)
+        res['lvl'] = 1
         res['Tweet_id'] = twi.id
         res['User_id'] = twi.user.id
         res['User_name'] = twi.user.name
@@ -101,14 +102,19 @@ def harvest_to_couchdb(api,url,header,city_name):
             if res == -1:
                 break
             elif res:
-                res = json.dumps(res, cls=DateEncoder)
-                requests.post(url=url, headers=header, data=res)
+                res1 = json.dumps(res, cls=DateEncoder)
+                requests.post(url=url, headers=header, data=res1)
+                res['lvl'] = 2
+                res2 = json.dumps(res, cls=DateEncoder)
+                requests.post(url=url, headers=header, data=res2)
+                exit(0)
         return True
-    except:
+
+    except Exception:
         return False
 
 def main():
-    url = 'http://admin:admin@172.26.131.4:5984/twitter'  # couchDB url
+    url = 'http://admin:admin@172.26.131.4:5984/twitter-test'  # couchDB url
     header = {"Content-Type": "application/json"}
     apiData = TwitterAPI()
     api = apiData.generate_api()
