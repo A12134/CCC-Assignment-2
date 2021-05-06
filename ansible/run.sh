@@ -3,7 +3,7 @@
 # install docker on the remote servers
 
 
-ansible-playbook -i inventory.ini -u ubuntu --key-file=./Group60   docker.yaml
+#ansible-playbook -i inventory.ini -u ubuntu --key-file=./Group60   docker.yaml
 
 
 

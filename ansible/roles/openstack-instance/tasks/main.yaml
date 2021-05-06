@@ -75,24 +75,63 @@
 
 
 
-# - name: Wait for connection
-#   wait_for:
-#     host: '{{ item.openstack.public_v4 }}'
-#     port: 22
-#     timeout : 120
-#     search_regex: OpenSSH
-#   loop : '{{ os_instance.results }}'
-#   when : item.openstack is defined
+- name: Wait for connection
+  wait_for:
+    host: '{{ os_instance1.openstack.public_v4 }}'
+    port: 22
+    timeout : 120
+    search_regex: OpenSSH
+  when : os_instance1.openstack is defined
 
+- name: Wait for connection
+  wait_for:
+    host: '{{ os_instance2.openstack.public_v4 }}'
+    port: 22
+    timeout : 120
+    search_regex: OpenSSH
+  when : os_instance2.openstack is defined
+
+- name: Wait for connection
+  wait_for:
+    host: '{{ os_instance3.openstack.public_v4 }}'
+    port: 22
+    timeout : 120
+    search_regex: OpenSSH
+  when : os_instance3.openstack is defined
+
+- name: Wait for connection
+  wait_for:
+    host: '{{ os_instance4.openstack.public_v4 }}'
+    port: 22
+    timeout : 120
+    search_regex: OpenSSH
+  when : os_instance4.openstack is defined
 
 
 
 - name: Add host
   add_host:
-    name: '{{ item.openstack.name }}'
+    name: '{{ os_instance1.openstack.name }}'
     groups: COMP90024
-  loop : '{{ os_instance.results }}'
-  when: item.openstack is defined
+  when: os_instance1.openstack is defined
+
+- name: Add host
+  add_host:
+    name: '{{ os_instance2.openstack.name }}'
+    groups: COMP90024
+  when: os_instance2.openstack is defined
+
+- name: Add host
+  add_host:
+    name: '{{ os_instance3.openstack.name }}'
+    groups: COMP90024
+  when: os_instance3.openstack is defined
+
+- name: Add host
+  add_host:
+    name: '{{ os_instance4.openstack.name }}'
+    groups: COMP90024
+  when: os_instance4.openstack is defined
 
 # - name: create file
 #   become: yes

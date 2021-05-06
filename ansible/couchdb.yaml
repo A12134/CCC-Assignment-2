@@ -1,5 +1,5 @@
 
- # Perform CouchDB configuration on all hosts except Masternode
+ #Perform CouchDB configuration on all hosts except Masternode
 - hosts: subnode1:subnode2:subnode3
   vars_files:
     - host-vars/couchdb.yaml
