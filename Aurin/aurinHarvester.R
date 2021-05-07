@@ -1,3 +1,11 @@
+install.packages('sf')
+install.packages('rgdal')
+install.packages('gdalUtils')
+install.packages('jsonlite')
+install.packages('httr')
+
+setwd("/home/ubuntu/Aurin")
+
 library(sf)
 library(rgdal)
 library(gdalUtils)
