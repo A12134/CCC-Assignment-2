@@ -1,1 +1,81 @@
+"These commands can be run on our ins-4"
+-------------------------------------------- root -------------------------------------------- 
+sudo passwd root   (admin)
+su  (admin)
 
+-------------------------------------------- Aurin -------------------------------------------- 
+
+##### 1. install R #####
+sudo apt update -qq
+
+sudo apt install --no-install-recommends software-properties-common dirmngr
+
+sudo apt-key adv --keyserver keyserver.ubuntu.com --keyserver-options http-proxy=http://wwwproxy.unimelb.edu.au:8000/ --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+
+sudo add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
+
+sudo apt install --no-install-recommends r-base r-base-dev
+
+sudo add-apt-repository ppa:c2d4u.team/c2d4u4.0+
+
+##### 2. install GDAL #####
+sudo apt update
+
+sudo apt install libpq-dev
+
+apt install gdal-bin libgdal-dev
+
+##### 3.  write XML file for Aurin API connection  #####
+mkdir /home/ubuntu/Aurin
+
+sudo nano /home/ubuntu/Aurin/aurin_wfs_connection.xml
+
+<OGRWFSDataSource>
+
+<URL>http://openapi.aurin.org.au/wfs?version=1.0.0</URL>
+
+<HttpAuth>BASIC</HttpAuth>
+
+<UserPwd>student:dj78dfGF</UserPwd>
+
+</OGRWFSDataSource>
+
+##### 4. download Aurin data & upload to couchDB ##### 
+"This sample command is run in R. You may either create .R and .sh file to run this."
+R               
+     
+install.packages('sf')
+install.packages('rgdal')
+install.packages('gdalUtils')
+install.packages('jsonlite')
+install.packages('httr')
+
+setwd("/home/ubuntu/Aurin")
+
+library(sf)
+library(rgdal)
+library(gdalUtils)
+library(jsonlite)
+library(httr)
+
+temp_file = "output.json"
+
+ogr2ogr("aurin_wfs_connection.xml",
+        temp_file, 
+        "aurin:datasource-AU_Govt_DSS-UoM_AURIN_dss_quarterly_payment_recipients_sa2_mar_2020",
+        f="GeoJSON",
+        oo="INVERT_AXIS_ORDER_IF_LAT_LONG=NO")
+
+data = read_json("output.json",simplifyVector = FALSE) 
+data = data$features
+n= length(data)
+myurl = c("http://172.26.131.4:5984/quarterly_payment_recipients_sa2_mar_2020")
+myheaders = c('content-type'='application/json')
+for(i in 1:n){
+  instance = toJSON(data[[i]]$properties)
+  web = POST(url = myurl,
+       add_headers(.headers = myheaders),
+       authenticate("admin","admin"),
+       body = instance
+  )
+}
