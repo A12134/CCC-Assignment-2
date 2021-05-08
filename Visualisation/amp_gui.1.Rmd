@@ -1,0 +1,212 @@
+---
+title: "Map	Visualisation"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    social: menu
+    source_code: embed
+
+runtime: shiny
+---
+
+```{r global, include=FALSE}
+rm(list = ls())
+gc()
+#("/Users/liammi/data_ccc")
+library(leaflet)
+library(shiny)
+library(shinydashboard)
+library(flexdashboard)
+library(rgdal)
+library(htmltools)
+#Melbourne
+data1 <- rgdal::readOGR("/Users/liammi/desktop/data_ccc/Output__spatialise-dataset_Apr-29_19_45/shp/2a34a39b-8853-49e3-a82a-245504ba24aa.shp")
+data1
+#Sydney
+data2 <- rgdal::readOGR("/Users/liammi/desktop/data_ccc/Output__spatialise-dataset_Apr-29_19_52/shp/f3b93342-751f-46c8-8cac-13f3decd2b6c.shp")
+#Brisbane
+data3 <- rgdal::readOGR("/Users/liammi/desktop/data_ccc/Output__spatialise-dataset_Apr-29_22_38/shp/deccc81c-370f-4440-85f5-0641962f8ce3.shp")
+#Perth 
+data4 <- rgdal::readOGR("/Users/liammi/desktop/data_ccc/Output__spatialise-dataset_Apr-29_22_41/shp/985f58ac-e7a2-41df-a807-d50c1e2c1ad7.shp")
+#Adelaide 
+data5 <- rgdal::readOGR("/Users/liammi/desktop/data_ccc/Output__spatialise-dataset_Apr-29_22_45/shp/a3d848bd-fdb2-4687-bf05-a2d713db5606.shp")
+
+
+
+```
+
+Inputs {.sidebar}
+----------------------------------------------------------
+
+```{r}
+
+selectInput('City', 
+            h4('Please select a city'),
+            c('City',"Melbourne","Sydney","Brisbane","Perth","Adelaide"),
+            selected = "City"
+            )
+
+selectInput('Variable', 
+            h4('Please select a scenario'),
+            c("NULL","Jobseeker"),
+            selected = "NULL"
+            )
+
+
+
+```
+
+
+
+Column {data-width=600}
+--------------------------------------------------------
+### Map Column {data-width=600}
+```{r}
+renderLeaflet({
+Bpal1 <- colorNumeric(palette = "Reds", data1@data$jobseeker0)
+Bpal2 <- colorNumeric(palette = "Reds", data2@data$jobseeker0)
+Bpal3 <- colorNumeric(palette = "Reds", data3@data$jobseeker0)
+Bpal4 <- colorNumeric(palette = "Reds", data4@data$jobseeker0)
+Bpal5 <- colorNumeric(palette = "Reds", data5@data$jobseeker0)
+if(input$City == "City"& input$Variable == "NULL"){
+ leaflet() %>% 
+  setView(lng =133.2092 ,lat = -28,zoom = 5 ) %>% 
+  #addTiles() %>% 
+  addTiles(urlTemplate = "http://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", attribution = 'Google') %>% 
+  addPolygons(data= data1,stroke = FALSE, smoothFactor = 0.3, fillOpacity = 1
+              ,color = "green"
+  ) %>% 
+  addPolygons(data= data2,stroke = FALSE, smoothFactor = 0.3, fillOpacity = 1
+              ,color = "green"
+             
+              
+  ) %>% 
+  addPolygons(data= data3,stroke = FALSE, smoothFactor = 0.3, fillOpacity = 1
+              ,color = "green"
+             
+              
+  ) %>% 
+  addPolygons(data= data4,stroke = FALSE, smoothFactor = 0.3, fillOpacity = 1
+              ,color = "green"
+              #,fillColor = ~Bpal(map@data$value)
+              # ,label = ~paste0(BoroName, ": ", count)
+              
+  ) %>% 
+  addPolygons(data= data5,stroke = FALSE, smoothFactor = 0.3, fillOpacity = 1
+              ,color = "green"
+             
+              
+  )
+  
+}
+else if(input$City == "Melbourne" & input$Variable == "NULL") {
+  leaflet() %>% 
+   
+  addTiles(urlTemplate = "http://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", attribution = 'Google') %>% 
+  addPolygons(data= data1, smoothFactor = 0.3, fillOpacity = 0.8
+              ,color = "black",weight=1,stroke = TRUE,
+              fillColor = ~Bpal1(0),popup = ~htmltools::htmlEscape(sa2_name)
+  ) }
+  
+else if(input$City == "Melbourne" & input$Variable == "Jobseeker" ) {
+  leaflet() %>% 
+  
+  addTiles(urlTemplate = "http://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", attribution = 'Google') %>% 
+  addPolygons(data= data1,stroke = FALSE, smoothFactor = 0.3, fillOpacity = 1
+              ,color = "green",
+              fillColor = ~Bpal1(data1@data$jobseeker0)
+              ,popup = ~htmltools::htmlEscape(sa2_name)
+  ) }  
+
+else if(input$City == "Sydney"& input$Variable == "NULL") {
+  leaflet() %>% 
+  
+  addTiles(urlTemplate = "http://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", attribution = 'Google') %>% 
+  addPolygons(data= data2, smoothFactor = 0.3, fillOpacity = 0.8,fillColor = ~Bpal2(0)
+              ,color = "black",weight=1,stroke = TRUE,popup = ~htmltools::htmlEscape(sa2_name)
+  ) }
+
+else if(input$City == "Sydney" & input$Variable == "Jobseeker" ) {
+  leaflet() %>% 
+  
+  addTiles(urlTemplate = "http://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", attribution = 'Google') %>% 
+  addPolygons(data= data2,stroke = FALSE, smoothFactor = 0.3, fillOpacity = 1
+              ,color = "green",
+              fillColor = ~Bpal2(data2@data$jobseeker0),popup = ~htmltools::htmlEscape(sa2_name)
+  ) } 
+  
+else if(input$City == "Brisbane"& input$Variable == "NULL") {
+  leaflet() %>% 
+  
+  addTiles(urlTemplate = "http://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", attribution = 'Google') %>% 
+  addPolygons(data= data3, smoothFactor = 0.3, fillOpacity = 0.8,fillColor = ~Bpal3(0)
+              ,color = "black",weight=1,stroke = TRUE,popup = ~htmltools::htmlEscape(sa2_name)
+  ) }
+
+else if(input$City == "Brisbane" & input$Variable == "Jobseeker" ) {
+  leaflet() %>% 
+  #addTiles() %>% 
+  addTiles(urlTemplate = "http://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", attribution = 'Google') %>% 
+  addPolygons(data= data3,stroke = FALSE, smoothFactor = 0.3, fillOpacity = 1
+              ,color = "green",
+              fillColor = ~Bpal3(data3@data$jobseeker0),popup = ~htmltools::htmlEscape(sa2_name)
+  ) } 
+
+else if(input$City == "Perth" & input$Variable == "NULL") {
+  leaflet() %>% 
+  
+  addTiles(urlTemplate = "http://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", attribution = 'Google') %>% 
+  addPolygons(data= data4, smoothFactor = 0.3, fillOpacity = 0.8,fillColor = ~Bpal4(0)
+              ,color = "black",weight=1,stroke = TRUE,popup = ~htmltools::htmlEscape(sa2_name)
+  ) }
+  
+else if(input$City == "Perth" & input$Variable == "Jobseeker" ) {
+  leaflet() %>% 
+  
+  addTiles(urlTemplate = "http://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", attribution = 'Google') %>% 
+  addPolygons(data= data4,stroke = FALSE, smoothFactor = 0.3, fillOpacity = 1
+              ,color = "green",
+              fillColor = ~Bpal4(data4@data$jobseeker0),popup = ~htmltools::htmlEscape(sa2_name)
+  ) } 
+  
+else if(input$City == "Adelaide"& input$Variable == "NULL") {
+  leaflet() %>% 
+  
+  addTiles(urlTemplate = "http://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", attribution = 'Google') %>% 
+  addPolygons(data= data5, smoothFactor = 0.3, fillOpacity = 0.8,fillColor = ~Bpal5(0)
+              ,color = "black",weight=1,stroke = TRUE,popup = ~htmltools::htmlEscape(sa2_name)
+  ) }
+  
+else if(input$City == "Adelaide" & input$Variable == "Jobseeker" ) {
+  leaflet() %>% 
+  
+  addTiles(urlTemplate = "http://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", attribution = 'Google') %>% 
+  addPolygons(data= data5,stroke = FALSE, smoothFactor = 0.3, fillOpacity = 1
+              ,color = "green",
+              fillColor = ~Bpal5(data5@data$jobseeker0),popup = ~htmltools::htmlEscape(sa2_name)
+  ) } 
+  
+})
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
