@@ -110,8 +110,8 @@ def harvest_to_couchdb(api,url,header,city_name):
     except Exception:
         return False
 
-def main():
-    url = 'http://admin:admin@172.26.131.211:5984/twitter'  # couchDB url
+def main(argv):
+    url = argv   # couchDB url
     header = {"Content-Type": "application/json"}
     apiData = TwitterAPI()
     api = apiData.generate_api()
@@ -125,4 +125,4 @@ def install():
 
 if __name__ == "__main__":
     install()
-    main()
+    main(sys.argv[-1])
