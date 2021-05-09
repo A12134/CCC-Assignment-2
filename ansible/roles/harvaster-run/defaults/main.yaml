@@ -1,0 +1,9 @@
+
+---
+
+# Use first node in hosts list as masternode for CouchDB
+masternode: "{{ groups['subnode1'] | join()  }}"
+
+subnode2: "{{ groups['subnode2'] | join()  }}"
+subnode3: "{{ groups['subnode3'] | join()  }}"
+subnode1: "{{ groups['subnode1'] | join()  }}"

@@ -83,13 +83,25 @@
     body: "{\"action\":\"finish_cluster\"}"    
   run_once: true
 
+
+
+# - name: create database
+#   become: yes
+#   shell: curl -X PUT http://{{ user }}:{{ pass }}@{{ masternode }}:5984/twitter?n=3&q=8&partitioned=true
+
+
+
+
+# - name: Transfer database.sh.
+#   become: yes
+#   copy:
+#     src: ./
+#     dest: /home/ubuntu/
+#     mode: 0777
+
+
 - name: create database
-  become: yes
-  shell: curl -X PUT http://{{ user }}:{{ pass }}@{{ masternode }}:5984/twitter?n=3&q=8&partitioned=true
-
-
-
-
+  command: curl -X PUT http://{{ user }}:{{ pass }}@{{ masternode }}:5984/twitter?n=3&q=8&partitioned=true
 
 
 

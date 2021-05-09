@@ -1,3 +1,4 @@
+#1
 import re
 from textblob import TextBlob
 import datetime
@@ -110,7 +111,7 @@ def harvest_to_couchdb(api,url,header,city_name):
         return False
 
 def main():
-    url = 'http://admin:admin@172.26.131.4:5984/twitter'  # couchDB url
+    url = 'http://admin:admin@172.26.131.211:5984/twitter'  # couchDB url
     header = {"Content-Type": "application/json"}
     apiData = TwitterAPI()
     api = apiData.generate_api()

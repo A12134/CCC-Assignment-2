@@ -39,17 +39,23 @@
 # - name: execute install script
 #   script: ./Twitter.py 
 
-- name: Transfer and execute a script.
+- name: Transfer Twitter.py.
   become: yes
   copy:
-    src: ./Twitter.py 
+    src: ../../../../Harvest/Twitter.py 
     dest: /home/ubuntu/
     mode: 0777
 
+- name: Transfer TwitterAuth.json.
+  become: yes
+  copy:
+    src: ../../../../Harvest/TwitterAuth.json
+    dest: /home/ubuntu/
+    mode: 0777
 
-- name: run the write_file.py after it has already been transferred
-  command: python3 /home/ubuntu/Twitter.py 
-
-
-- debug:
-    msg: "http://admin:admin@{{subnode1}}:5984/twitter"
+- name: Transfer requirements.txt.
+  become: yes
+  copy:
+    src: ../../../../Harvest/requirements.txt 
+    dest: /home/ubuntu/
+    mode: 0777

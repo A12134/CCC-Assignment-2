@@ -6,9 +6,11 @@
     mode: 0777
 
 
-- name: Run the command 
+# - name: Run the command 
 
-  command: sh ./aurin.sh 
+#   command: sh /home/ubuntu/aurin.sh
+
+
 
 # - name: ejecutar script como sudo
 #   become: yes
@@ -32,3 +34,16 @@
 #   tasks:
 #     - name: Copy and Execute the script 
 #       script: ./aurin.sh
+
+
+
+
+
+- name: Let's copy our executable script to remote location, execute script .
+  remote_user: root
+  become: yes
+  command: sh /home/ubuntu/aurin.sh
+
+
+- debug:
+    msg: "subnode1"

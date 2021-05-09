@@ -1,0 +1,4 @@
+- hosts: subnode1:subnode2:subnode3
+  gather_facts: true
+  roles:
+    - role: harvaster-run

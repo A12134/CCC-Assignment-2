@@ -11,7 +11,7 @@
 
 
 
- # Perform CouchDB configuration on 
+ # Perform CouchDB configuration on subnode1
 - hosts: subnode1
   vars_files:
     - host-vars/couchdb.yaml

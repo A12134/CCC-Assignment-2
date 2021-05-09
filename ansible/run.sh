@@ -3,11 +3,11 @@
 # install docker on the remote servers
 
 
-#ansible-playbook -i inventory.ini -u ubuntu --key-file=./Group60   docker.yaml
+# ansible-playbook -i inventory.ini -u ubuntu --key-file=./Group60   docker.yaml
 
 
 
-# setup couchdb cluster on database servers
-#ansible-playbook -i inventory.ini -u ubuntu --key-file=./Group60  couchdb.yaml
+# # setup couchdb cluster on database servers
+# ansible-playbook -i inventory.ini -u ubuntu --key-file=./Group60  couchdb.yaml
 
-ansible-playbook -i inventory.ini -u ubuntu --key-file=./Group60  harvaster.yaml
+ansible-playbook -i inventory.ini -u ubuntu --key-file=./Group60  run-harvaster.yaml
