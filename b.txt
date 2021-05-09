@@ -1,9 +1,0 @@
-<OGRWFSDataSource>
-
-<URL>http://openapi.aurin.org.au/wfs?version=1.0.0</URL>
-
-<HttpAuth>BASIC</HttpAuth>
-
-<UserPwd>student:dj78dfGF</UserPwd>
-
-</OGRWFSDataSource>
