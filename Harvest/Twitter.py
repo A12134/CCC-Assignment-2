@@ -110,7 +110,7 @@ def harvest_to_couchdb(api,url,header,city_name):
         return False
 
 def main():
-    url = 'http://admin:admin@172.26.131.4:5984/twitter-test'  # couchDB url
+    url = 'http://admin:admin@172.26.131.4:5984/twitter'  # couchDB url
     header = {"Content-Type": "application/json"}
     apiData = TwitterAPI()
     api = apiData.generate_api()
