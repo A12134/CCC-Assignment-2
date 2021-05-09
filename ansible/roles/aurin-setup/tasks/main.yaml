@@ -1,0 +1,34 @@
+- name: Transfer and execute a script.
+  become: yes
+  copy:
+    src: ./aurin.sh
+    dest: /home/ubuntu/
+    mode: 0777
+
+
+- name: Run the command 
+
+  command: sh ./aurin.sh 
+
+# - name: ejecutar script como sudo
+#   become: yes
+#   script: ./aurin.sh
+
+# - name: Transfer and execute a script.
+#   become: yes
+#   sudo: yes
+#   tasks:
+#      - name: Transfer the script
+#        copy: src=./aurin.sh dest=/home/ubuntu/ mode=0777
+
+#      - name: Execute the script
+#        command: sh /home/ubuntu/aurin.sh
+
+
+
+# - name: Transfer and execute a script.
+#   hosts: all
+#   become: yes
+#   tasks:
+#     - name: Copy and Execute the script 
+#       script: ./aurin.sh
