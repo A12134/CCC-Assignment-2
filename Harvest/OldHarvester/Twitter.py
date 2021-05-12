@@ -97,7 +97,7 @@ def harvest_to_couchdb(api,url,header,city_name):
             tweets = api.search(q="place:%s" % place_id)
             text = tweets[0].text
         text_user_id = tweets[0].user.id
-        for tweet in tweepy.Cursor(api.user_timeline, user_id=text_user_id).items():
+        for tweet in tweepy.Cursor(api.user_timeline, user_id=text_user_id, exclude_replies=True).items():
             res = process(tweet)
             if res == -1:
                 break

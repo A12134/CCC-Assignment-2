@@ -4,6 +4,7 @@ click==7.1.2
 idna==2.10
 joblib==1.0.1
 nltk==3.6.2
+numpy==1.20.3
 oauthlib==3.1.0
 PySocks==1.7.1
 regex==2021.4.4
