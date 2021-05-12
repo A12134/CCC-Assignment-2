@@ -42,6 +42,7 @@ class TwitterAPI(Thread):
             except:
                 pass
 
+
 class UserHarvester(Thread):
     def __init__(self, api, userChannel, apiChannel):
         Thread.__init__(self)
@@ -79,14 +80,14 @@ class UserHarvester(Thread):
                         except Exception as e:
                             i -= 1
                             if errorCount > 1:
-                                print("Auto fix not working, check error below:")
+                                print("Auto fix not working, check error below, retry in 30secs:")
                                 print(e)
-                                break
+                                time.sleep(30)
                             else:
                                 self.apiChannel.put(0)
                                 print(
-                                    "Something went wrong, user harvester paused,trying auto fix by switching twitter api, resume in 1 second.\n")
-                                time.sleep(1)
+                                    "Something went wrong, user harvester paused,trying auto fix by switching twitter api, resume in 10 second.\n")
+                                time.sleep(10)
                                 errorCount += 1
 
 
@@ -105,9 +106,9 @@ class UserHarvester(Thread):
                         self.__harvest_user__(tweets)
                     except Exception as e:
                         if errorCount > 1:
-                            print("Auto fix not working, check error below:")
+                            print("Auto fix not working, check error below, retry in 30 sec:")
                             print(e)
-                            print('\n')
+                            time.sleep(30)
                             break
                         else:
                             self.apiChannel.put(0)
@@ -169,10 +170,6 @@ class TweetHarvester(Thread):
                     print("\nSomething went wrong, tweet harvester paused,trying auto fix by switching twitter api, resume in 5 second.")
                     time.sleep(5)
 
-
-
-
-
     def run(self):
         while True:
             """
@@ -230,6 +227,7 @@ class TweetHarvester(Thread):
         [polarity, subjectivity] = blob.sentiment
         return polarity, subjectivity
 
+
 class CouchDBClient(Thread):
     def __init__(self, dataChannel, url, header):
         Thread.__init__(self)
@@ -244,6 +242,7 @@ class CouchDBClient(Thread):
             data = json.dumps(data, cls=DateEncoder)
             requests.post(url=self.url, headers=self.header, data=data)
 
+
 class DateEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
@@ -254,6 +253,7 @@ class DateEncoder(json.JSONEncoder):
 
 def install():
     subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "-r", "requirements.txt"])
+
 
 def main(argv):
     config = json.load(open("Config.json"))
@@ -268,6 +268,7 @@ def main(argv):
     userH.start()
     tweetH.start()
     print("Harvester is running smoothly.....")
+
 
 if __name__ == "__main__":
     install()
