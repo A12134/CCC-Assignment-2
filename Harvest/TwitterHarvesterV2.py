@@ -7,7 +7,9 @@ import subprocess
 import sys
 import time
 from queue import Queue
+import queue
 import re
+import atexit
 from textblob import TextBlob
 
 
@@ -26,9 +28,10 @@ class TwitterAPIV2(Thread):
         self.bearer = self.tokens[0]["bearer_token"]
         auth = tweepy.OAuthHandler(self.tokens[0]["consumer_key"], self.tokens[0]["consumer_secret"])
         auth.set_access_token(self.tokens[0]["access_token"], self.tokens[0]["access_token_secret"])
-        self.api = api = tweepy.API(auth, wait_on_rate_limit=False)
+        self.api = tweepy.API(auth, wait_on_rate_limit=False)
         self.currentToken = 0
         self.channel = channel
+        self.running = True
 
         self.user_url  = "https://api.twitter.com/2/users/{}/tweets"
         print("Currently using twitter token: ", self.currentToken + 1, "/", len(self.tokens))
@@ -115,11 +118,13 @@ class TwitterAPIV2(Thread):
 
 
     def run(self):
-        while True:
-            read = self.channel.get()
-            self.channel.queue.clear()
-            self.nextToken()
-
+        while self.running:
+            try:
+                read = self.channel.get(block=True, timeout=1)
+                self.channel.queue.clear()
+                self.nextToken()
+            except:
+                pass
 
 class UserFetcher(Thread):
     def __init__(self, API, UserOut, APIUpdate, config_area):
@@ -128,9 +133,11 @@ class UserFetcher(Thread):
         self.api_update = APIUpdate
         self.api = API
         self.users = {}
-        self.currentDate = datetime.datetime.today()
+        #self.currentDate = datetime.datetime.today()
+        self.currentDate = datetime.datetime.today() - datetime.timedelta(days=1)
         self.isNextDay = False
         self.areas = config_area
+        self.running = True
 
     def extract_user_info(self, tweets):
         for tweet in tweets:
@@ -164,7 +171,7 @@ class UserFetcher(Thread):
                         time.sleep(5)
 
     def monitor_users(self):
-        self.isNextDay = not (self.currentDate == datetime.datetime.today().strftime('%Y-%m-%d'))
+        self.isNextDay = not (self.currentDate.strftime('%Y-%m-%d') == datetime.datetime.today().strftime('%Y-%m-%d'))
         if self.isNextDay:
             print("[UserFetcher][Info] Running user extraction on ", self.currentDate.strftime('%Y-%m-%d'))
             for area in self.areas:
@@ -183,12 +190,23 @@ class UserFetcher(Thread):
                     except Exception as e:
                         self.api_update.put(0)
                         print("[UserFetcher][Info] ", e, " Switching tokens...")
+        self.currentDate = datetime.datetime.today()
 
     def start(self):
-        self.fetch_users_in_week()
+        """
+        When harvester started, go through activated user within given region is likely causing all five api
+        to exceeded rate limit, this is now disabled.
+
+        To enable:
+                (1) uncomment the code below
+                (2) uncomment:  "#self.currentDate = datetime.datetime.today()" in __init__(self)
+                (3) comment-out: "self.currentDate = datetime.datetime.today() - datetime.timedelta(days=1)"
+        """
+        # self.fetch_users_in_week()
+        Thread.start(self)
 
     def run(self):
-        while True:
+        while self.running:
             self.monitor_users()
 
 
@@ -199,6 +217,7 @@ class TweetFetcher(Thread):
         self.user_in = userIn
         self.api_update = APIUpdate
         self.db_out = DBOut
+        self.running = True
 
     def fetch_user_tweets(self, userInfo):
         user_id = userInfo[0]
@@ -228,21 +247,27 @@ class TweetFetcher(Thread):
             res['User_location_Type'] = loc_type
         else:
             # get geo info by place_id
-            repeat = True
-            while repeat:
-                try:
-                    data = self.api.api.geo_id(twi['geo']['place_id'])
-                    res['User_Coordinates'] = data.centroid
-                    res['User_Location'] = data.full_name
-                    res['User_Location_Type'] = data.place_type
-                    repeat = False
-                except Exception as e:
-                    print("[UserFetcher][Info] ", e, " Switching tokens...")
+            try:
+                data = self.api.api.geo_id(twi['geo']['place_id'])
+                res['User_Coordinates'] = data.centroid
+                res['User_Location'] = data.full_name
+                res['User_Location_Type'] = data.place_type
+            except Exception as e:
+                self.api_update.put(0)
+                res['User_Coordinates'] = coord
+                res['User_location'] = loc
+                res['User_location_Type'] = loc_type
 
-        if twi['entities'].get('hashtags') is not None:
-            res['Hashtag'] = [item["text"] for item in twi['entities']['hashtags']]
+        if twi.get('entities') is not None:
+            if twi['entities'].get('hashtags') is not None:
+                res['Hashtag'] = []
+                for t in twi['entities']['hashtags']:
+                    res['Hashtag'].append(t['tag'])
+            else:
+                res['Hashtag'] = "null"
         else:
             res['Hashtag'] = "null"
+
 
         res['Text'] = self.clean_tweet(twi['text'])
         polarity, subjectivity, indicator = self.count_sentiment(twi['text'])
@@ -283,9 +308,12 @@ class TweetFetcher(Thread):
         return [c_x, c_y]
 
     def run(self):
-        while True:
-            userInfo = self.user_in.get()
-            self.fetch_user_tweets(userInfo)
+        while self.running:
+            try:
+                userInfo = self.user_in.get(block=True, timeout=1)
+                self.fetch_user_tweets(userInfo)
+            except:
+                pass
 
 
 class CouchDBClient(Thread):
@@ -294,21 +322,36 @@ class CouchDBClient(Thread):
         self.db_in = db_in
         self.url = url
         self.header = {"Content-Type": "application/json"}
+        self.postCount = 0
+        self.running = True
 
     def post_to_db(self, data):
         data = json.dumps(data, cls=DateEncoder)
-        requests.post(url=self.url, headers=self.header, data=data)
+        r = requests.post(url=self.url, headers=self.header, data=data)
+        pass
 
     def run(self):
-        while True:
-            data = self.db_in.get()
-            self.post_to_db(data)
-
-
+        while self.running:
+            try:
+                data = self.db_in.get(block=True, timeout=1)
+                self.post_to_db(data)
+                self.postCount += 1
+                if self.postCount % 500 == 0:
+                    print("pushed total ", self.postCount, " docs")
+            except:
+                pass
 
 
 def install():
     subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "-r", "requirements.txt"])
+
+def close(t1,t2,t3,t4):
+    t1.running = False
+    t2.running = False
+    t3.running = False
+    t4.running = False
+    print("harvester shutdown in 5 secs")
+    time.sleep(5)
 
 def main(argv):
     user_channel, api_channel, db_channel = Queue(), Queue(), Queue()
@@ -319,6 +362,8 @@ def main(argv):
     user_fetcher = UserFetcher(api, user_channel, api_channel, config["Areas"])
     tweet_fetcher = TweetFetcher(api, user_channel, api_channel, db_channel)
     db_client = CouchDBClient(argv, db_channel)
+
+    atexit.register(close,api,user_fetcher,tweet_fetcher,db_client)
 
     api.start()
     user_fetcher.start()
