@@ -34,7 +34,7 @@ class TwitterAPIV2(Thread):
         self.running = True
 
         self.user_url  = "https://api.twitter.com/2/users/{}/tweets"
-        print("Currently using twitter token: ", self.currentToken + 1, "/", len(self.tokens))
+        #print("Currently using twitter token: ", self.currentToken + 1, "/", len(self.tokens))
 
     def nextToken(self):
         self.currentToken = (self.currentToken+1) % len(self.tokens)
@@ -43,7 +43,7 @@ class TwitterAPIV2(Thread):
         self.api.auth.access_token_secret = self.tokens[self.currentToken]["access_token_secret"]
         self.api.auth.consumer_key = str.encode(self.tokens[self.currentToken]["consumer_key"], encoding='utf-8')
         self.api.auth.consumer_secret = str.encode(self.tokens[self.currentToken]["consumer_secret"], encoding='utf-8')
-        print("Currently using twitter token: ", self.currentToken + 1, "/", len(self.tokens))
+        #print("Currently using twitter token: ", self.currentToken + 1, "/", len(self.tokens))
 
     def getHeader(self):
         return {"Authorization": "Bearer {}".format(self.bearer)}
@@ -350,8 +350,9 @@ def close(t1,t2,t3,t4):
     t2.running = False
     t3.running = False
     t4.running = False
-    print("harvester shutdown in 5 secs")
-    time.sleep(5)
+    for i in range(5,0,-1):
+        print("harvester shutdown in %i secs"%i)
+        time.sleep(1)
 
 def main(argv):
     user_channel, api_channel, db_channel = Queue(), Queue(), Queue()
