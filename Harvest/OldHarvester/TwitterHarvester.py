@@ -28,11 +28,17 @@ class TwitterAPI(Thread):
         api = tweepy.API(auth, wait_on_rate_limit=False)
         self.api = api
         print("Currently using twitter token: ", self.tokenIndex+1, "/", len(self.tokens))
-        return api
+        return self.api
 
     def generate_new_api(self):
+
         self.tokenIndex = (self.tokenIndex + 1) % len(self.tokens)
-        return self.generate_api()
+        token = self.tokens[self.tokenIndex]
+        self.api.auth.access_token = token["access_token"]
+        self.api.auth.access_token_secret = token["access_token_secret"]
+        self.api.auth.consumer_key = str.encode(token["consumer_key"], encoding='utf-8')
+        self.api.auth.consumer_secret = str.encode(token["consumer_secret"], encoding='utf-8')
+        print("Currently using twitter token: ", self.tokenIndex + 1, "/", len(self.tokens))
 
     def run(self):
         while True:
@@ -80,14 +86,15 @@ class UserHarvester(Thread):
                         except Exception as e:
                             i -= 1
                             if errorCount > 1:
-                                print("Auto fix not working, check error below, retry in 30secs:")
+                                print("Auto fix not working, check error below, retry in 5 secs:")
                                 print(e)
-                                time.sleep(30)
+                                self.apiChannel.put(0)
+                                time.sleep(5)
                             else:
                                 self.apiChannel.put(0)
                                 print(
-                                    "Something went wrong, user harvester paused,trying auto fix by switching twitter api, resume in 10 second.\n")
-                                time.sleep(10)
+                                    "Something went wrong, user harvester paused,trying auto fix by switching twitter api, resume in 2 second.\n")
+                                time.sleep(2)
                                 errorCount += 1
 
 
@@ -106,15 +113,16 @@ class UserHarvester(Thread):
                         self.__harvest_user__(tweets)
                     except Exception as e:
                         if errorCount > 1:
-                            print("Auto fix not working, check error below, retry in 30 sec:")
+                            print("Auto fix not working, check error below, retry in 5 sec:")
                             print(e)
-                            time.sleep(30)
+                            self.apiChannel.put(0)
+                            time.sleep(5)
                             break
                         else:
                             self.apiChannel.put(0)
                             print(
-                                "\nSomething went wrong, user harvester paused, trying auto fix by switching twitter api, resume in 5 second.")
-                            time.sleep(5)
+                                "\nSomething went wrong, user harvester paused, trying auto fix by switching twitter api, resume in 2 second.")
+                            time.sleep(2)
                             errorCount += 1
 
             self.currentDate = datetime.datetime.today()
@@ -151,7 +159,7 @@ class TweetHarvester(Thread):
 
         while errorCount != 0:
             try:
-                for tweet in tweepy.Cursor(self.api.user_timeline, user_id=userID).items():
+                for tweet in tweepy.Cursor(self.api.user_timeline, user_id=userID, exclude_replies=True, include_rts=False).items():
                     errorCount = 0
                     processed_twi = self.process(tweet, userCoord)
                     if processed_twi is None:
@@ -164,6 +172,7 @@ class TweetHarvester(Thread):
                     print("auto fix does not work, full exception log shown below:\n")
                     print(e)
                     print('\n')
+                    self.apiChannel.put(0)
                     break
                 else:
                     self.apiChannel.put(0)
