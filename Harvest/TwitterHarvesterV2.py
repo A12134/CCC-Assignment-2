@@ -220,24 +220,21 @@ class TweetFetcher(Thread):
         res['Tweet_id'] = twi['id']
         res['User_id'] = user_id
         res['User_name'] = user_name
-        res['User_Coordinates'] = coord
-        res['User_location'] = loc
-        res['User_location_Type'] = loc_type
         res['Create_time'] = twi['created_at']
 
         if twi.get('geo') is None:
-            res['Tweet_Coordinates'] = coord
-            res['Tweet_Location'] = ""
-            res['Tweet_Location_Type'] = ""
+            res['User_Coordinates'] = coord
+            res['User_location'] = loc
+            res['User_location_Type'] = loc_type
         else:
             # get geo info by place_id
             repeat = True
             while repeat:
                 try:
                     data = self.api.api.geo_id(twi['geo']['place_id'])
-                    res['Tweet_Coordinates'] = data.centroid
-                    res['Tweet_Location'] = data.full_name
-                    res['Tweet_Location_Type'] = data.place_type
+                    res['User_Coordinates'] = data.centroid
+                    res['User_Location'] = data.full_name
+                    res['User_Location_Type'] = data.place_type
                     repeat = False
                 except Exception as e:
                     print("[UserFetcher][Info] ", e, " Switching tokens...")
