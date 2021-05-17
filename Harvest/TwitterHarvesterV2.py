@@ -237,7 +237,7 @@ class TweetFetcher(Thread):
 
         res['_id'] = str(user_id) + ":" + str(twi['id'])
         res['Tweet_id'] = twi['id']
-        res['User_id'] = user_id
+        res['User_id'] = str(user_id)
         res['User_name'] = user_name
         res['Create_time'] = twi['created_at']
 
@@ -271,7 +271,7 @@ class TweetFetcher(Thread):
 
         res['Text'] = self.clean_tweet(twi['text'])
         polarity, subjectivity, indicator = self.count_sentiment(twi['text'])
-        res['Polarity'] = format(polarity, '.3f')
+        res['Polarity'] = float(format(polarity, '.3f'))
         res['Subjectivity'] = format(subjectivity, '.3f')
         res['Sentiment Indicator'] = indicator
         return res
