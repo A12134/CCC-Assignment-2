@@ -242,12 +242,14 @@ class TweetFetcher(Thread):
         time = twi['created_at']
         time = time.split("T")[0]
         dates = time.split("-")
-        if dates[0] == "2020" and int(dates[1]) <= 2:
-            res['Period'] = "before"
-        elif dates[0] == "2020" and int(dates[1]) >= 3 and int(dates[1]) <= 6:
-            res['Period'] = "during"
+        if dates[0] == "2020" and int(dates[1]) <= 3:
+            res['Period'] = "2020 1-3"
+        elif dates[0] == "2020" and int(dates[1]) >= 4 and int(dates[1]) <= 6:
+            res['Period'] = "2020 4-6"
+        elif dates[0] == "2020" and int(dates[1]) >= 10 and int(dates[1]) <= 12:
+            res['Period'] = "2020 10-12"
         else:
-            res['Period'] = "after"
+            res['Period'] = "2021 1-3"
 
 
         res['Create_time'] = time
