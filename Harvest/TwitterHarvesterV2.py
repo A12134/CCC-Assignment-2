@@ -239,7 +239,18 @@ class TweetFetcher(Thread):
         res['Tweet_id'] = twi['id']
         res['User_id'] = str(user_id)
         res['User_name'] = user_name
-        res['Create_time'] = twi['created_at']
+        time = twi['created_at']
+        time = time.split("T")[0]
+        dates = time.split("-")
+        if dates[0] == "2020" and int(dates[1]) <= 2:
+            res['Period'] = "before"
+        elif dates[0] == "2020" and int(dates[1]) >= 3 and int(dates[1]) <= 6:
+            res['Period'] = "during"
+        else:
+            res['Period'] = "after"
+
+
+        res['Create_time'] = time
 
         if twi.get('geo') is None:
             res['User_Coordinates'] = coord
