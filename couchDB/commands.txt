@@ -106,6 +106,9 @@ curl -XPOST "http://${user}:${pass}@${masternode}:5984/_cluster_setup"\
 
 ##### 5. create database #####
 curl -XPUT "http://${user}:${pass}@${masternode}:5984/twitter?n=3&q=8&partitioned=true"
-curl -XPUT "http://${user}:${pass}@${masternode}:5984/quarterly_payment_recipients_sa2_mar_2020?n=2&q=1"
+
+
+##### 6. create view #####
+curl -XPUT -d @analysis.js 'http://${user}:${pass}@${masternode}:5984/twitter/_design/analysis'
 
 
