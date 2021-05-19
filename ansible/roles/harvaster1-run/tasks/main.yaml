@@ -1,0 +1,8 @@
+
+
+- name: run the py after it has already been transferred
+  command: python3 /home/ubuntu/TwitterHarvesterV2.py "http://admin:admin@{{subnode1}}:5984/twitter" Config_Ins_1.json &
+
+
+- debug:
+    msg: "http://admin:admin@{{subnode1}}:5984/twitter"

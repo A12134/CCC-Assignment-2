@@ -49,12 +49,27 @@
     dest: /home/ubuntu/
     mode: 0777
 
-- name: Transfer Config.json.
+- name: Transfer Config_Ins_1.json.
   become: yes
   copy:
-    src: ../../../../Harvest/Config.json
+    src: ../../../../Harvest/Config_Ins_1.json
     dest: /home/ubuntu/
     mode: 0777
+
+- name: Transfer Config_Ins_2.json.
+  become: yes
+  copy:
+    src: ../../../../Harvest/Config_Ins_2.json
+    dest: /home/ubuntu/
+    mode: 0777
+
+- name: Transfer Config_Ins_3.json.
+  become: yes
+  copy:
+    src: ../../../../Harvest/Config_Ins_3.json
+    dest: /home/ubuntu/
+    mode: 0777
+
 
 - name: Transfer requirements.txt.
   become: yes
@@ -62,3 +77,8 @@
     src: ../../../../Harvest/requirements.txt 
     dest: /home/ubuntu/
     mode: 0777
+
+- name: run the requirements.txt
+  command: python3 -m pip install --user -r /home/ubuntu/requirements.txt
+
+

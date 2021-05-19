@@ -3,6 +3,9 @@
   roles:
     - role: harvaster-setup
 
+
+
+
 - hosts: masternode
   remote_user: ubuntu
   gather_facts: true
