@@ -355,7 +355,10 @@ def close(t1,t2,t3,t4):
         time.sleep(1)
 
 def main(argv):
-    args = argv.split(" ")
+    args = []
+    for i, arg in enumerate(argv):
+        args.append(arg)
+        
     config_path  = args[1]
     db_url = args[0]
     user_channel, api_channel, db_channel = Queue(), Queue(), Queue()
@@ -376,4 +379,4 @@ def main(argv):
 
 if __name__ == "__main__":
     #install()
-    main(sys.argv[-1])
+    main(sys.argv)
