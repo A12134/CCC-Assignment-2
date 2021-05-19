@@ -1,6 +1,6 @@
 library(httr)
 
-myviewURL = "http://172.26.132.19:5984/twitter/_design/analysis/_view/city?reduce=true&group_level=3"
+myviewURL = "http://172.26.132.19:5984/twitter/_design/analysis/_view/suburb?reduce=true&group_level=4"
 viewData = GET(url = myviewURL, 
                authenticate("admin","admin")
                ) %>% content()
@@ -9,6 +9,7 @@ viewData = viewData$rows
 periods = c("2020 1-3", "2020 4-6", "2020 10-12", "2021 1-3")
 data = data.frame(time = c(0),
                   city = c(0),
+                  suburb = c(0),
                   posCount = c(0),
                   negCount = c(0),
                   neuCount = c(0),
@@ -24,23 +25,25 @@ for (i in 1:length(viewData)){
   keys = row$key
   time = keys[1][[1]]
   city = keys[2][[1]]
-  feature = keys[3][[1]]
+  suburb = keys[3][[1]]
+  feature = keys[4][[1]]
   value = row$value
-  if(!city %in% data$city){
+  if(!suburb %in% data$suburb){
     for(j in 1:4){
       n = nrow(data)
       data[n+1,1]= periods[j]
       data[n+1,2]= city
+      data[n+1,3]= suburb
     }
   }
   if(feature == "Polarity"){
-    data[which(data$time==time & data$city==city),6] = value
+    data[which(data$time==time & data$city==city & data$suburb==suburb),7] = value
   }else if(feature == "positiveCount"){
-    data[which(data$time==time & data$city==city),3] = value
+    data[which(data$time==time & data$city==city & data$suburb==suburb),4] = value
   }else if(feature == "negativeCount"){
-    data[which(data$time==time & data$city==city),4] = value
+    data[which(data$time==time & data$city==city & data$suburb==suburb),5] = value
   }else if(feature == "nuetralCount"){
-    data[which(data$time==time & data$city==city),5] = value
+    data[which(data$time==time & data$city==city & data$suburb==suburb),6] = value
   }
 }
 data = data[-1,]
