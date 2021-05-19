@@ -77,10 +77,12 @@ class TwitterAPIV2(Thread):
                 else:
                     repeat = False
                     response_str = response.json()
-                    try:
+                    
+                    if response_str['meta']['result_count'] == 0:
+                        return ret_array
+                    else:
                         ret_array = ret_array + response_str["data"]
-                    except:
-                        pass
+
                     if response_str["meta"].get("next_token") is not None:
                         pag_token = response_str["meta"]["next_token"]
                     else:
