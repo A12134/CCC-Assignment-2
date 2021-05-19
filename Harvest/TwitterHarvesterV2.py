@@ -77,7 +77,10 @@ class TwitterAPIV2(Thread):
                 else:
                     repeat = False
                     response_str = response.json()
-                    ret_array = ret_array + response_str["data"]
+                    try:
+                        ret_array = ret_array + response_str["data"]
+                    except:
+                        pass
                     if response_str["meta"].get("next_token") is not None:
                         pag_token = response_str["meta"]["next_token"]
                     else:
@@ -358,9 +361,9 @@ def main(argv):
     args = []
     for i, arg in enumerate(argv):
         args.append(arg)
-        
-    config_path  = args[1]
-    db_url = args[0]
+
+    config_path  = args[2]
+    db_url = args[1]
     user_channel, api_channel, db_channel = Queue(), Queue(), Queue()
 
     config = json.load(open(config_path, 'r', encoding='utf-8'))
