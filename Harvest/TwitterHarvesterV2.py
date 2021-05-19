@@ -279,7 +279,6 @@ class TweetFetcher(Thread):
         res['Create_time'] = time
 
         res['User_Location'] = address
-        print(address)
         if twi.get('entities') is not None:
             if twi['entities'].get('hashtags') is not None:
                 res['Hashtag'] = []
