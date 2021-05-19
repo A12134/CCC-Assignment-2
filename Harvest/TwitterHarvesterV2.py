@@ -11,6 +11,8 @@ import queue
 import re
 import atexit
 from textblob import TextBlob
+from geopy.geocoders import Nominatim
+from geopy.point import Point
 
 
 class DateEncoder(json.JSONEncoder):
@@ -239,6 +241,7 @@ class TweetFetcher(Thread):
         res['Tweet_id'] = twi['id']
         res['User_id'] = str(user_id)
         res['User_name'] = user_name
+        res['Coordinates'] = coord
         time = twi['created_at']
         time = time.split("T")[0]
         dates = time.split("-")
@@ -253,23 +256,9 @@ class TweetFetcher(Thread):
 
 
         res['Create_time'] = time
+        geolocator = Nominatim(user_agent="twitter-harvester")
 
-        if twi.get('geo') is None:
-            res['User_Coordinates'] = coord
-            res['User_location'] = loc
-            res['User_location_Type'] = loc_type
-        else:
-            # get geo info by place_id
-            try:
-                data = self.api.api.geo_id(twi['geo']['place_id'])
-                res['User_Coordinates'] = data.centroid
-                res['User_Location'] = data.full_name
-                res['User_Location_Type'] = data.place_type
-            except Exception as e:
-                self.api_update.put(0)
-                res['User_Coordinates'] = coord
-                res['User_location'] = loc
-                res['User_location_Type'] = loc_type
+        res['User_Location'] = geolocator.reverse(Point(coord[1],coord[0])).raw
 
         if twi.get('entities') is not None:
             if twi['entities'].get('hashtags') is not None:
@@ -322,11 +311,9 @@ class TweetFetcher(Thread):
 
     def run(self):
         while self.running:
-            try:
-                userInfo = self.user_in.get(block=True, timeout=1)
-                self.fetch_user_tweets(userInfo)
-            except:
-                pass
+            userInfo = self.user_in.get(block=True)
+            self.fetch_user_tweets(userInfo)
+
 
 
 class CouchDBClient(Thread):
@@ -368,14 +355,17 @@ def close(t1,t2,t3,t4):
         time.sleep(1)
 
 def main(argv):
+    args = argv.split(" ")
+    config_path  = args[1]
+    db_url = args[0]
     user_channel, api_channel, db_channel = Queue(), Queue(), Queue()
 
-    config = json.load(open("Config.json", 'r', encoding='utf-8'))
+    config = json.load(open(config_path, 'r', encoding='utf-8'))
 
     api = TwitterAPIV2(config["TwitterAuth"], api_channel)
     user_fetcher = UserFetcher(api, user_channel, api_channel, config["Areas"])
     tweet_fetcher = TweetFetcher(api, user_channel, api_channel, db_channel)
-    db_client = CouchDBClient(argv, db_channel)
+    db_client = CouchDBClient(db_url, db_channel)
 
     atexit.register(close,api,user_fetcher,tweet_fetcher,db_client)
 
@@ -385,5 +375,5 @@ def main(argv):
     db_client.start()
 
 if __name__ == "__main__":
-    install()
+    #install()
     main(sys.argv[-1])
