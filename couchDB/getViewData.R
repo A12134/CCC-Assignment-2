@@ -1,4 +1,5 @@
 library(httr)
+library(RCurl)
 
 myviewURL = "http://172.26.132.19:5984/twitter/_design/analysis/_view/suburb?reduce=true&group_level=4"
 viewData = GET(url = myviewURL, 
