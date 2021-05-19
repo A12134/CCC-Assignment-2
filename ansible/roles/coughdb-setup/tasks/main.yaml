@@ -103,5 +103,15 @@
 - name: create database
   command: curl -X PUT http://{{ user }}:{{ pass }}@{{ masternode }}:5984/twitter?n=3&q=8&partitioned=true
 
+- name: Transfer analysis.js.
+  become: yes
+  copy:
+    src: ../../../../couchDB/analysis.js
+    dest: /home/ubuntu/
+    mode: 0777
+
+- name: create view
+  command: curl -XPUT -d @analysis.js http://{{ user }}:{{ pass }}@{{ masternode }}:5984/twitter/_design/analysis
+
 
 

@@ -9,3 +9,5 @@ ansible-playbook -i inventory.ini -u ubuntu --key-file=./Group60   docker.yaml
 ansible-playbook -i inventory.ini -u ubuntu --key-file=./Group60  couchdb.yaml
 
 ansible-playbook -i inventory.ini -u ubuntu --key-file=./Group60  harvaster.yaml
+
+ansible-playbook -i inventory.ini -u ubuntu --key-file=./Group60  frontend.yaml

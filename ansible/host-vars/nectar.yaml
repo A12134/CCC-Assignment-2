@@ -29,6 +29,19 @@ security_groups:
     port_range_max : 80
     remote_ip_prefix : 0.0.0.0/0
 
+  - name: r
+    description: "security groups for r"
+    protocol : tcp
+    port_range_min : 8787
+    port_range_max : 8787
+    remote_ip_prefix : 0.0.0.0/0
+
+  - name: r2
+    description: "security groups for r2"
+    protocol : tcp
+    port_range_min : 5050
+    port_range_max : 5050
+    remote_ip_prefix : 0.0.0.0/0
 
   - name: couchdb1
     description: "open port for couchdb1"
