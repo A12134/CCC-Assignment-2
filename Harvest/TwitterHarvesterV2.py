@@ -154,7 +154,7 @@ class UserFetcher(Thread):
                 geolocator = Nominatim(user_agent="twitter-harvester")
                 coord = self.count_average_coord(tweet.place.bounding_box.coordinates)
                 point = Point(coord[1], coord[0])
-                self.user_out.put((tweet.user.id,tweet.place.bounding_box.coordinates, tweet.user.location, tweet.user.name, tweet.place.place_type, geolocator.reverse(point).raw))
+                self.user_out.put((tweet.user.id,coord,tweet.user.location, tweet.user.name, tweet.place.place_type, geolocator.reverse(point).raw))
                 #print("User Harvester pushed: ", tweet.user.id)
             else:
                 continue
