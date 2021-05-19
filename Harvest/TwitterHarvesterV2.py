@@ -77,7 +77,7 @@ class TwitterAPIV2(Thread):
                 else:
                     repeat = False
                     response_str = response.json()
-                    
+
                     if response_str['meta']['result_count'] == 0:
                         return ret_array
                     else:
@@ -151,7 +151,10 @@ class UserFetcher(Thread):
             # if find a new user, add it to the pending user dict
             if self.users.get(tweet.user.id) is None:
                 self.users[tweet.user.id] = True
-                self.user_out.put((tweet.user.id,tweet.place.bounding_box.coordinates, tweet.user.location, tweet.user.name, tweet.place.place_type))
+                geolocator = Nominatim(user_agent="twitter-harvester")
+                coord = self.count_average_coord(tweet.place.bounding_box.coordinates)
+                point = Point(coord[1], coord[0])
+                self.user_out.put((tweet.user.id,tweet.place.bounding_box.coordinates, tweet.user.location, tweet.user.name, tweet.place.place_type, geolocator.reverse(point).raw))
                 #print("User Harvester pushed: ", tweet.user.id)
             else:
                 continue
@@ -199,6 +202,18 @@ class UserFetcher(Thread):
                         print("[UserFetcher][Info] ", e, " Switching tokens...")
         self.currentDate = datetime.datetime.today()
 
+    def count_average_coord(self, coords):
+        count = 0
+        c_x = 0
+        c_y = 0
+        for c in coords[0]:
+            count += 1
+            c_x += float(c[0])
+            c_y += float(c[1])
+        c_x = c_x/count
+        c_y = c_y/count
+        return [c_x, c_y]
+
     def start(self):
         """
         When harvester started, go through activated user within given region is likely causing all five api
@@ -228,18 +243,19 @@ class TweetFetcher(Thread):
 
     def fetch_user_tweets(self, userInfo):
         user_id = userInfo[0]
-        user_coord = self.count_average_coord(userInfo[1])
+        user_coord = userInfo[1]
         user_location = userInfo[2]
         user_name = userInfo[3]
         user_location_type = userInfo[4]
+        user_address = userInfo[5]
         tweets = self.api.getUserTimeline(user_id)
 
         # TODO process tweets
         for tweet in tweets:
-            p_t = self.process_tweet(tweet, user_id, user_name, user_coord, user_location, user_location_type)
+            p_t = self.process_tweet(tweet, user_id, user_name, user_coord, user_location, user_location_type, user_address)
             self.db_out.put(p_t)
 
-    def process_tweet(self, twi, user_id, user_name, coord, loc, loc_type):
+    def process_tweet(self, twi, user_id, user_name, coord, loc, loc_type, address):
         res = dict()
 
         res['_id'] = str(user_id) + ":" + str(twi['id'])
@@ -261,10 +277,9 @@ class TweetFetcher(Thread):
 
 
         res['Create_time'] = time
-        geolocator = Nominatim(user_agent="twitter-harvester")
 
-        res['User_Location'] = geolocator.reverse(Point(coord[1],coord[0])).raw
-
+        res['User_Location'] = address
+        print(address)
         if twi.get('entities') is not None:
             if twi['entities'].get('hashtags') is not None:
                 res['Hashtag'] = []
@@ -301,18 +316,6 @@ class TweetFetcher(Thread):
         elif polarity > 0:
             ind = 1
         return polarity, subjectivity, ind
-
-    def count_average_coord(self, coords):
-        count = 0
-        c_x = 0
-        c_y = 0
-        for c in coords[0]:
-            count += 1
-            c_x += float(c[0])
-            c_y += float(c[1])
-        c_x = c_x/count
-        c_y = c_y/count
-        return [c_x, c_y]
 
     def run(self):
         while self.running:
