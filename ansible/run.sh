@@ -10,4 +10,8 @@
 # # setup couchdb cluster on database servers
 # ansible-playbook -i inventory.ini -u ubuntu --key-file=./Group60  couchdb.yaml
 
-ansible-playbook -i inventory.ini -u ubuntu --key-file=./Group60  run-harvaster.yaml
+#ansible-playbook -i inventory.ini -u ubuntu --key-file=./Group60  run-harvaster.yaml
+
+
+
+ansible-playbook -i inventory.ini -u ubuntu --key-file=./Group60  frontend.yaml
