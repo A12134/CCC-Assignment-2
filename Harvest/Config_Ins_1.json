@@ -13,27 +13,6 @@
       "consumer_secret": "ygsBZdPrdk2EJ7sPrlJRcH5X2oIKObwQfW2hCBJSYilbwASIxW",
       "access_token": "1132630138351366145-xiDOa76fE8ZMJqcKMDlmvja6JUExXE",
       "access_token_secret": "ijALruC0g63ZkRh1Hb81rRFzKixEuLQdoAaQhr8ohgWwR"
-	},
-    {
-      "bearer_token" : "AAAAAAAAAAAAAAAAAAAAAIEvPgEAAAAAayVRfiAETMhGcRPeclc2%2BHx76Rk%3DTSbGeJtjmH7UAhwSBZK1Aw4LuK1AakSYFQO4pmKhhXZa8ZGxxY",
-	  "consumer_key" : "ZyWsIHy9WOqMCRuDGfoyp3hVM",
-      "consumer_secret": "3bo7Xqp24AWVBd2s65yb48bgDctZleYkSwY2NL9yjL59OZkn9U",
-      "access_token": "1389181786437996545-0NnsUpOHegztZ3T0T4F5SZI5tzXQHC",
-      "access_token_secret": "jBMBQaf9cq9zxnr4Vn9Jc3YnsNxKM1EKH6IQKjRJIByZy"
-	},
-    {
-      "bearer_token" : "AAAAAAAAAAAAAAAAAAAAAPQrPgEAAAAAo5D7pYXC80q24zgrYMQpz%2FIknwM%3Dei3FidYFXWepaWgkEzAwJMYfpFuqM6lLleNojHsE8i9SK1D7dE",
-	  "consumer_key" : "YaFbzinvJDdxIL2MmWpfyqg9v",
-      "consumer_secret": "3kr05lgLGnv57ef0qMpiJZr7JADcJXoPXb0UYPGS5aFk5Yhgle",
-      "access_token": "1389437150408568835-DfO4p1Z5kx9mQx1BoF2VwnVS8dGFYc",
-      "access_token_secret": "hOlrWiyC5Z64jXROTSrnxU0zliC8k4HckFl9HiUvuvsuv"
-	},
-    {
-      "bearer_token" : "AAAAAAAAAAAAAAAAAAAAAOBmPgEAAAAAqhqU4MZJZtvP7qLJQD4fabUlHho%3DWbeYcJkPA1AEysl2gSHlXUcgknDirOTEgHIBUDazCTTNgE8Xak",
-	  "consumer_key" : "UrEulFTe7Wjb9B6D1MmWp9VoR",
-      "consumer_secret": "emeGvkgNZxg2IfHN9lv8z46oBNopEVdphCFjaxUtDPB3asAyXd",
-      "access_token": "1384421870506713090-ORIfLSmCpuYTQ98W2OMmE6kh5bBcr7",
-      "access_token_secret": "mSPLT9egpcxnoDqNhQGJegN5g9udno7VmvDifR8DTSCbt"
 	}
   ],
 

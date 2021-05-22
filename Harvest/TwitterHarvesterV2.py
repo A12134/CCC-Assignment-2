@@ -13,6 +13,7 @@ import atexit
 from textblob import TextBlob
 from geopy.geocoders import Nominatim
 from geopy.point import Point
+import geopy
 
 
 class DateEncoder(json.JSONEncoder):
@@ -35,8 +36,26 @@ class TwitterAPIV2(Thread):
         self.channel = channel
         self.running = True
 
-        self.user_url  = "https://api.twitter.com/2/users/{}/tweets"
+        self.user_url = "https://api.twitter.com/2/users/{}/tweets"
         #print("Currently using twitter token: ", self.currentToken + 1, "/", len(self.tokens))
+
+
+    def getGeoObj(self, id):
+        url = "https://api.twitter.com/2/tweets?ids={}&expansions=geo.place_id&place.fields=contained_within,country,country_code,full_name,geo,id,name,place_type".format(id)
+        repeat = True
+        while repeat:
+            try:
+                response = requests.request("GET",url, headers=self.getHeader())
+                if response.status_code != 200:
+                    print(response.status_code, " ", response.text)
+                    repeat = True
+                    self.nextToken()
+                else:
+                    repeat = False
+                    response_str = response.json()
+                    return response_str["includes"]['places'][0]
+            except:
+                return None
 
     def nextToken(self):
         self.currentToken = (self.currentToken+1) % len(self.tokens)
@@ -97,29 +116,33 @@ class TwitterAPIV2(Thread):
             response = requests.request("GET",
                                         url,
                                         headers=self.getHeader(),
-                                        params={"start_time": start_time,
+                                        params={
+                                            "expansions": "geo.place_id",
+                                            "start_time": start_time,
                                                 "end_time": end_time,
                                                 "tweet.fields": "created_at,author_id,entities,geo",
-                                                "max_results":"100",
+                                                "max_results":"100"
                                                 # this works, keep this
-                                                "expansions": "geo.place_id",
+
                                                 # this param does not work, and not affect anything
-                                                "place.fields": "contained_within,country,country_code,full_name,geo,id,name,place_type"})
+                                                })
                                                 # this param also does not work, and not affect anything
             return response
         else:
             response = requests.request("GET",
                                         url,
                                         headers=self.getHeader(),
-                                        params={"start_time": start_time,
+                                        params={
+                                            "expansions": "geo.place_id",
+                                            "start_time": start_time,
                                                 "end_time": end_time,
                                                 "tweet.fields": "created_at,author_id,entities,geo",
                                                 "max_results": "100",
-                                                "pagination_token":pagination_token,
+                                                "pagination_token":pagination_token
                                                 # this works, keep this
-                                                "expansions": "geo.place_id",
+
                                                 # this param does not work, and not affect anything
-                                                "place.fields": "contained_within,country,country_code,full_name,geo,id,name,place_type"})
+                                                })
                                                 # this param also does not work, and not affect anything
             return response
 
@@ -224,7 +247,7 @@ class UserFetcher(Thread):
                 (2) uncomment:  "#self.currentDate = datetime.datetime.today()" in __init__(self)
                 (3) comment-out: "self.currentDate = datetime.datetime.today() - datetime.timedelta(days=1)"
         """
-        # self.fetch_users_in_week()
+        #self.fetch_users_in_week()
         Thread.start(self)
 
     def run(self):
@@ -253,7 +276,8 @@ class TweetFetcher(Thread):
         # TODO process tweets
         for tweet in tweets:
             p_t = self.process_tweet(tweet, user_id, user_name, user_coord, user_location, user_location_type, user_address)
-            self.db_out.put(p_t)
+            if p_t is not None:
+                self.db_out.put(p_t)
 
     def process_tweet(self, twi, user_id, user_name, coord, loc, loc_type, address):
         res = dict()
@@ -278,7 +302,29 @@ class TweetFetcher(Thread):
 
         res['Create_time'] = time
 
-        res['User_Location'] = address
+
+        if twi.get('geo') is not None:
+            p = self.api.getGeoObj(twi['id'])
+            if p is not None:
+                # check if country code matches
+                if p['country_code'] == "AU":
+                    try:
+                        sum_coord_1 = (p['geo']['bbox'][0] + p['geo']['bbox'][2])/2
+                        sum_coord_2 = (p['geo']['bbox'][1] + p['geo']['bbox'][3])/2
+                        point = Point(sum_coord_2, sum_coord_1)
+                        geolocator = Nominatim(user_agent="twitter-harvester")
+                        res['User_Location'] = geolocator.reverse(point).raw
+                    except:
+                        res['User_Location'] = address
+
+                else:
+                    res['User_Location'] = address
+            else:
+                res['User_Location'] = address
+        else:
+            res['User_Location'] = address
+
+
         if twi.get('entities') is not None:
             if twi['entities'].get('hashtags') is not None:
                 res['Hashtag'] = []

@@ -1,33 +1,5 @@
 {
   "TwitterAuth" : [
-	{
-      "bearer_token" : "AAAAAAAAAAAAAAAAAAAAAOKDPAEAAAAAoccTt6bZzOOULocutAlXnN53NBw%3DRUoUZfPFlByWhcVYe5jyspYFkUg8C0Ocb6lM5w80I51A6bAobL",
-	  "consumer_key" : "rXx6njDJoFKnnqoAEH9lcFaDA",
-      "consumer_secret": "ZUGY6aCUByH9PjXfLfNcbeZjM53Ae7G9DBKaTy2Vg9sXkQx3D6",
-      "access_token": "1388445236200841220-5xvwItc42Mfl1L5pODiCqXr0fn2gAU",
-      "access_token_secret": "GbLNQ3QONLyySy7uQzsFX7bGYeX0bz328p3IjqIz0ZGUt"
-	},
-	{
-      "bearer_token" : "AAAAAAAAAAAAAAAAAAAAAM%2BjPAEAAAAA%2FdwjYWgzNkBV2FyaymWgsjLA%2FXs%3Dw94VoV3YImlLvtmF871YfAOv6touORzv5gK4GqhEkQUikp50um",
-	  "consumer_key" : "uShVUeILo7E89Hd74kj6d0yYs",
-      "consumer_secret": "ygsBZdPrdk2EJ7sPrlJRcH5X2oIKObwQfW2hCBJSYilbwASIxW",
-      "access_token": "1132630138351366145-xiDOa76fE8ZMJqcKMDlmvja6JUExXE",
-      "access_token_secret": "ijALruC0g63ZkRh1Hb81rRFzKixEuLQdoAaQhr8ohgWwR"
-	},
-    {
-      "bearer_token" : "AAAAAAAAAAAAAAAAAAAAAIEvPgEAAAAAayVRfiAETMhGcRPeclc2%2BHx76Rk%3DTSbGeJtjmH7UAhwSBZK1Aw4LuK1AakSYFQO4pmKhhXZa8ZGxxY",
-	  "consumer_key" : "ZyWsIHy9WOqMCRuDGfoyp3hVM",
-      "consumer_secret": "3bo7Xqp24AWVBd2s65yb48bgDctZleYkSwY2NL9yjL59OZkn9U",
-      "access_token": "1389181786437996545-0NnsUpOHegztZ3T0T4F5SZI5tzXQHC",
-      "access_token_secret": "jBMBQaf9cq9zxnr4Vn9Jc3YnsNxKM1EKH6IQKjRJIByZy"
-	},
-    {
-      "bearer_token" : "AAAAAAAAAAAAAAAAAAAAAPQrPgEAAAAAo5D7pYXC80q24zgrYMQpz%2FIknwM%3Dei3FidYFXWepaWgkEzAwJMYfpFuqM6lLleNojHsE8i9SK1D7dE",
-	  "consumer_key" : "YaFbzinvJDdxIL2MmWpfyqg9v",
-      "consumer_secret": "3kr05lgLGnv57ef0qMpiJZr7JADcJXoPXb0UYPGS5aFk5Yhgle",
-      "access_token": "1389437150408568835-DfO4p1Z5kx9mQx1BoF2VwnVS8dGFYc",
-      "access_token_secret": "hOlrWiyC5Z64jXROTSrnxU0zliC8k4HckFl9HiUvuvsuv"
-	},
     {
       "bearer_token" : "AAAAAAAAAAAAAAAAAAAAAOBmPgEAAAAAqhqU4MZJZtvP7qLJQD4fabUlHho%3DWbeYcJkPA1AEysl2gSHlXUcgknDirOTEgHIBUDazCTTNgE8Xak",
 	  "consumer_key" : "UrEulFTe7Wjb9B6D1MmWp9VoR",
