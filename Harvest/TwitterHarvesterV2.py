@@ -87,8 +87,13 @@ class TwitterAPIV2(Thread):
             while repeat:
                 if pag_token == "placeholder":
                     pag_token = None
+                
+                try:
+                    response = self.sending_request(url, start_time, end_time, pag_token)
+                except:
+                    self.nextToken()
+                    continue
 
-                response = self.sending_request(url, start_time, end_time, pag_token)
                 if response.status_code != 200:
                     print(response.status_code, " ", response.text)
                     repeat = True
