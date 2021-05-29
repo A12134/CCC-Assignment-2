@@ -4,4 +4,6 @@ This project presents all the works have been done by team 32 for COMP90024 Clus
 To deploy, please follow the instruction in the report using the Ansible script.
 
 Front end: http://172.26.132.56:80/
+CouchDB: http://172.26.132.19:5984/
+
 
